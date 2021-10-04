@@ -1,5 +1,10 @@
 "use strict";
 
+const db = require("../db");
+const bcrypt = require("bcrypt");
+
+const { SECRET_KEY, BCRYPT_WORK_FACTOR } = require("../config");
+
 /** User of the site. */
 
 class User {
@@ -9,16 +14,44 @@ class User {
    */
 
   static async register({ username, password, first_name, last_name, phone }) {
+    const hashedPassword = await bcrypt.hash(
+      password, BCRYPT_WORK_FACTOR);
+
+    const result = await db.query(
+      `INSERT INTO users (username, password, first_name, last_name, phone, join_at, last_login_at )
+             VALUES ($1, $2, $3, $4, $5, LOCALTIMESTAMP, CURRENT_TIMESTAMP)
+             RETURNING username, password, first_name, last_name, phone`,
+      [username, hashedPassword, first_name, last_name, phone]);
+
+    return res.json(result.rows[0]);
   }
 
   /** Authenticate: is username/password valid? Returns boolean. */
 
   static async authenticate(username, password) {
-  }
+    const result = await db.query(
+      `SELECT password 
+      FROM users 
+      WHERE username=$1`,
+      [username]);
+    let user = result.rows[0];
+
+    // question: shoule we throw error if no user? or just return false?
+    if (user) {
+      return await bcrypt.compare(password, user.password) === true;
+    } else {
+      return false;
+    }
 
   /** Update last_login_at for user */
 
   static async updateLoginTimestamp(username) {
+    // fix: no sure what syntax error this is ;
+    await db.query(
+      `UPDATE users
+      SET last_login_at=CURRENT_TIMESTAMP
+      WHERE username=$1`,
+      [username]);
   }
 
   /** All: basic info on all users:
