@@ -36,9 +36,8 @@ class User {
       [username]);
     let user = result.rows[0];
 
-    // question: shoule we throw error if no user? or just return false?
-    if (user) {
-      return await bcrypt.compare(password, user.password) === true;
+    if (user && await bcrypt.compare(password, user.password) === true) {
+      return true;
     } else {
       return false;
     }
