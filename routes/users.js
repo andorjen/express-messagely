@@ -21,7 +21,7 @@ router.get('/',
 
 /** GET /:username - get detail of users.
  *
- * => {user: {username, first_name, last_name, join_at, last_login_at}}
+ * => {user: {username, first_name, last_name, phone, join_at, last_login_at}}
  *
  **/
 router.get('/:username',
@@ -45,7 +45,7 @@ router.get('/:username/to',
     ensureCorrectUser,
     async function (req, res, next) {
         const { username } = req.params;
-        const messages = await User.messageTo(username);
+        const messages = await User.messagesTo(username);
         return res.json({ messages });
     });
 
@@ -63,7 +63,7 @@ router.get('/:username/from',
     ensureCorrectUser,
     async function (req, res, next) {
         const { username } = req.params;
-        const messages = await User.messageFrom(username);
+        const messages = await User.messagesFrom(username);
         return res.json({ messages });
     });
 
