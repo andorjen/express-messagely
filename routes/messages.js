@@ -2,6 +2,7 @@
 
 const Router = require("express").Router;
 const router = new Router();
+const Message = require('../models/message');
 
 /** GET /:id - get detail of message.
  *
@@ -16,6 +17,18 @@ const router = new Router();
  *
  **/
 
+router.get('/:id',
+    ensureLoggedIn,
+    async function (req, res, next) {
+        const message = await Message.get(req.params.id);
+        if (message.to_user === res.locals.user.username ||
+            message.from_user === res.locals.user.username) {
+            return res.json({ message });
+        }
+        throw new UnauthorizedError('You are not authorized to view this page.');
+    });
+
+
 
 /** POST / - post message.
  *
@@ -23,6 +36,18 @@ const router = new Router();
  *   {message: {id, from_username, to_username, body, sent_at}}
  *
  **/
+
+router.post('/',
+    ensureLoggedIn,
+    async function (req, res, next) {
+        const from_username = res.locals.user.username;
+        const { to_username, body } = req.body;
+        const message = await Message.create(
+            { from_username, to_username, body }
+        );
+
+        return res.json({ message });
+    });
 
 
 /** POST/:id/read - mark message as read:
@@ -33,5 +58,18 @@ const router = new Router();
  *
  **/
 
+router.post('/:id/read',
+    ensureLoggedIn,
+    async function (req, res, next) {
+        const messageId = req.params.id;
+        const message = await Message.get(messageId);
+        if (message.to_user === res.locals.user.username) {
+            const message = await Message.markRead(messageId);
+        } else {
+            throw new UnauthorizedError('You are not authorized for this action.');
+        }
+        return res.json({ message });
+    }
+);
 
 module.exports = router;

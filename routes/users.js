@@ -3,7 +3,7 @@
 const Router = require("express").Router;
 const router = new Router();
 const { ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
-const { User } = require('../models/user')
+const { User } = require('../models/user');
 
 /** GET / - get list of users.
  *

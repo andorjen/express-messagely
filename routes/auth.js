@@ -11,10 +11,10 @@ const { UnauthorizedError, BadRequestError } = require("../expressError");
 router.post('/login', async function (req, res, next) {
     const { username, password } = req.body;
     if (await User.authenticate(username, password) === true) {
-        let token = jwt.sign({ username }, SECRET_KEY);
+        const token = jwt.sign({ username }, SECRET_KEY);
         return res.json({ token });
     }
-    throw new UnauthorizedError("Invalid user/password!")
+    throw new UnauthorizedError("Invalid user/password!");
 })
 
 /** POST /register: registers, logs in, and returns token.
