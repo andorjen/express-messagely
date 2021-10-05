@@ -19,10 +19,10 @@ router.get('/',
 
 /** GET /:username - get detail of users.
  *
- * => {user: {username, first_name, last_name, phone, join_at, last_login_at}}
+ * => {user: {username, first_name, last_name, join_at, last_login_at}}
  *
  **/
-router.get('/:username',
+router.get('/:username', //FIXME: add error handleing to handle invalid user
     ensureCorrectUser,
     async function (req, res, next) {
         const { username } = req.params;
@@ -39,7 +39,7 @@ router.get('/:username',
  *                 from_user: {username, first_name, last_name, phone}}, ...]}
  *
  **/
-router.get('/:username/to',
+router.get('/:username/to', //FIXME: add error handleing to handle invalid user
     ensureCorrectUser,
     async function (req, res, next) {
         const { username } = req.params;

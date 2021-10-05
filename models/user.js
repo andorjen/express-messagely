@@ -36,7 +36,7 @@ class User {
       [username]);
     let user = result.rows[0];
 
-    if (user && await bcrypt.compare(password, user.password) === true) {
+    if (user && (await bcrypt.compare(password, user.password) === true)) { //NOte: write as ternery
       return true;
     } else {
       return false;
@@ -57,8 +57,8 @@ class User {
 
   static async all() {
     const results = await db.query(
-      `SELECT username, first_name, last_name, phone
-          FROM users`);
+      `SELECT username, first_name, last_name
+          FROM users`); //Note: orderby 
     return results.rows;
   }
 
@@ -71,7 +71,7 @@ class User {
    *          join_at,
    *          last_login_at } */
 
-  static async get(username) {
+  static async get(username) { //FIXME: throw an error to handle invalid usernames
     const result = await db.query(
       `SELECT username, first_name, last_name, phone, join_at, last_login_at
           FROM users
@@ -96,7 +96,7 @@ class User {
       [username]);
 
     let fromMessages = messageResults.rows;
-    for (let message of fromMessages) {
+    for (let message of fromMessages) { //FIXME: Use a join instead to solve performance issue
       const toUserResults = await db.query(
         `SELECT username, first_name, last_name, phone
             FROM users
